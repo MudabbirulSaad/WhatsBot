@@ -63,11 +63,15 @@ module.exports = {
       });
 
       let unzip = new AdmZip(fs.readFileSync(`${__dirname}/temp.zip`));
-      unzip.extractAllToAsync(base, true);
-      console.log("Session files replicated");
+      try {
+        unzip.extractAllTo(base, true);
+        console.log("Session files replicated");
+      } catch (error) {
+        throw new Error(`Failed to extract session files: ${error.toString()}`);
+      }
     } catch (error) {
       throw new Error(
-        `Session file not found, corrupted or password not matched. ${error.toString()}`
+        `Session file not found, corrupted, or password not matched. ${error.toString()}`
       );
     } finally {
       try {
@@ -75,6 +79,7 @@ module.exports = {
       } catch (_) {}
     }
   },
+
   fetchSession: async function fetchSession() {
     try {
       if (process.env.SESSION_URL) {
